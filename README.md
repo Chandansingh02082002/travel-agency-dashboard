@@ -78,6 +78,56 @@ Make sure to deploy the output of `npm run build`
 │   └── server/    # Server-side code
 ```
 
+## Google Profile Picture Integration
+
+This project includes functionality to fetch user profile pictures from Google People API through Appwrite OAuth integration.
+
+### Implementation Details
+
+The `getGooglePicture()` function in `app/appwrite/auth.ts` provides the following functionality:
+
+1. **Primary Method**: Uses Appwrite's `listIdentities()` to find the Google OAuth identity
+2. **Google People API**: If a Google identity with access token is found, calls the Google People API to fetch the profile picture
+3. **Fallback**: Attempts to retrieve profile picture from user preferences if available
+4. **Error Handling**: Returns `null` if no profile picture is found or if an error occurs
+
+### Usage Example
+
+```typescript
+import { getGooglePicture } from "~/appwrite/auth";
+
+const Dashboard = () => {
+  const [profilePicture, setProfilePicture] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const fetchProfilePicture = async () => {
+      try {
+        const pictureUrl = await getGooglePicture();
+        setProfilePicture(pictureUrl);
+      } catch (error) {
+        console.error('Failed to fetch profile picture:', error);
+      }
+    };
+
+    fetchProfilePicture();
+  }, []);
+
+  return (
+    <div>
+      {profilePicture && (
+        <img src={profilePicture} alt="Profile Picture" className="w-16 h-16 rounded-full" />
+      )}
+    </div>
+  );
+};
+```
+
+### Requirements
+
+- User must be authenticated via Google OAuth through Appwrite
+- Google People API access is automatically handled through the OAuth token
+- No additional API keys or configuration required beyond Appwrite setup
+
 ## Styling
 
 This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
